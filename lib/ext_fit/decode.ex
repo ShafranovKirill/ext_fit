@@ -694,11 +694,16 @@ defmodule ExtFit.Decode do
     err
   end
 
-  defp consume_string_until_null_or_end(<<>>), do: []
-  defp consume_string_until_null_or_end(<<0, _rest::binary>>), do: []
+  # Strings that are not valid UTF-8 are read as Latin-1 instead of crashing the whole
+  # decode.
+  defp consume_string_until_null_or_end(bin) do
+    [string | _] = :binary.split(bin, <<0>>)
 
-  defp consume_string_until_null_or_end(<<c::utf8, rest::binary>>) do
-    [c | consume_string_until_null_or_end(rest)] |> List.to_string()
+    cond do
+      string == "" -> []
+      String.valid?(string) -> string
+      true -> :unicode.characters_to_binary(string, :latin1)
+    end
   end
 
   defp component_bin(:invalid, _bits), do: <<>>
