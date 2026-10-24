@@ -474,7 +474,17 @@ defmodule ExtFit.Decode do
       source_cmp = parent_cmp || cmp
       cmp_field = %{cmp_field | offset: source_cmp.offset, scale: source_cmp.scale, units: source_cmp.units}
 
-      {fields, state} = unroll_components_into_fields(cmp_field, bin, def_mesg, state, fields, source_cmp)
+      # A component of a component is cut from the parent component's value, not from
+      # the source field's bytes.
+      {fields, state} =
+        unroll_components_into_fields(
+          cmp_field,
+          component_bin(cmp_raw_value, cmp.bits),
+          def_mesg,
+          state,
+          fields,
+          source_cmp
+        )
 
       if Field.name(field) == :event_timestamp_12 && cmp_raw_value == :invalid do
         {fields, state}
@@ -689,6 +699,13 @@ defmodule ExtFit.Decode do
 
   defp consume_string_until_null_or_end(<<c::utf8, rest::binary>>) do
     [c | consume_string_until_null_or_end(rest)] |> List.to_string()
+  end
+
+  defp component_bin(:invalid, _bits), do: <<>>
+
+  defp component_bin(value, bits) do
+    size = div(bits + 7, 8) * 8
+    <<value::little-unsigned-size(size)>>
   end
 
   # From spec:
