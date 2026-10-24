@@ -5,6 +5,11 @@
 [![Documentation](https://img.shields.io/badge/hex-docs-lightgreen.svg?style=flat)](https://hexdocs.pm/ext_fit)
 [![License](https://img.shields.io/hexpm/l/ext_fit.svg?style=flat)](https://github.com/arathunku/ext_fit/blob/main/LICENSE.md)
 
+> **Fork for kyop.** Branch `kyop` is ext_fit 0.1.0 (tag `v0.1.0`) with three decoder
+> fixes: components of an all-invalid array are not expanded, nested components are cut
+> from the parent component's value, and strings that are not valid UTF-8 are read as
+> Latin-1. Upstream: https://github.com/arathunku/ext_fit
+
 <!-- @moduledoc -->
 
 `.fit` file decoder. See `ExtFit.Decode` module for more details and usage.
