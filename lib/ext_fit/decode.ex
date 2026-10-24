@@ -410,7 +410,8 @@ defmodule ExtFit.Decode do
 
         cmp_bin =
           cond do
-            raw_value == :invalid || raw_value == [] ->
+            # an array whose every element is invalid decodes to nil
+            raw_value in [:invalid, nil, []] ->
               <<>>
 
             def_mesg.endian == :big ->
